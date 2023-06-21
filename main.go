@@ -73,6 +73,7 @@ func setupSetting() error {
 func setupDBEngine() error {
 	var err error
 	// use = 设置启动，不能用:= 因为其他包调用时是会是nil
+
 	global.DBEngine, err = model.NewDBEngine(global.DatabaseSetting)
 	if err != nil {
 		return err

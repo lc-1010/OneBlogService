@@ -1,9 +1,10 @@
 package model
 
 import (
-	"blog-server/global"
-	"blog-server/pkg/setting"
 	"fmt"
+
+	"github.com/lc-1010/OneBlogService/global"
+	"github.com/lc-1010/OneBlogService/pkg/setting"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
