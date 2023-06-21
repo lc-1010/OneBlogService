@@ -1,8 +1,8 @@
 package global
 
 import (
-	"blog-server/pkg/logger"
-	"blog-server/pkg/setting"
+	"github.com/lc-1010/OneBlogService/pkg/logger"
+	"github.com/lc-1010/OneBlogService/pkg/setting"
 )
 
 // 全局变量

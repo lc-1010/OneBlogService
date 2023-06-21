@@ -1,10 +1,11 @@
 package v1
 
 import (
-	"blog-server/global"
-	"blog-server/internal/model"
 	"fmt"
 	"net/http"
+
+	"github.com/lc-1010/OneBlogService/global"
+	"github.com/lc-1010/OneBlogService/internal/model"
 
 	"github.com/gin-gonic/gin"
 )

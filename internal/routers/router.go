@@ -1,7 +1,7 @@
 package routers
 
 import (
-	v1 "blog-server/internal/routers/api/v1"
+	v1 "github.com/lc-1010/OneBlogService/internal/routers/api/v1"
 
 	"github.com/gin-gonic/gin"
 )
