@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type Level int8
@@ -122,6 +123,28 @@ func (l *Logger) WithTrace() *Logger {
 			"span_id":  ginCtx.MustGet("X-Span-ID"),
 		})
 	}
+	return l
+}
+
+// SetTraceInfo 设置临时的trace id
+func (l *Logger) SetTraceInfo(c *gin.Context) *Logger {
+	// header 中拿
+	traceID := c.Request.Header.Get("X-Trace-ID")
+	spanID := c.Request.Header.Get("X-Span-ID")
+	// 如果 X-Trace-ID 和 X-Span-ID 不存在，则生成新的值
+	if traceID == "" {
+		traceID = uuid.New().String()
+		c.Request.Header.Set("X-Trace-ID", traceID)
+
+	}
+	if spanID == "" {
+		spanID = uuid.New().String()
+		c.Request.Header.Set("X-Span-ID", spanID)
+
+	}
+	c.Set("X-Trace-ID", traceID)
+	c.Set("X-Span-ID", spanID)
+	l.WithContext(c)
 	return l
 }
 

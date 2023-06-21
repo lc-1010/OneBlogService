@@ -50,9 +50,9 @@ type DatabaseSettingS struct {
 	MaxOpenConns int
 }
 
-var sections = make(map[string]interface{})
+var sections = make(map[string]any)
 
-func (s *Setting) ReadSection(k string, v interface{}) error {
+func (s *Setting) ReadSection(k string, v any) error {
 	err := s.vp.UnmarshalKey(k, v)
 	if err != nil {
 		return err

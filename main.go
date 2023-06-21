@@ -82,7 +82,7 @@ func setupDBEngine() error {
 }
 
 func setupLogger() error {
-	fileName := global.AppSetting.LogFileExt + "/" +
+	fileName := global.AppSetting.LogServePath + "/" +
 		global.AppSetting.LogFileName + global.AppSetting.LogFileExt
 	global.Logger = logger.NewLogger(&lumberjack.Logger{
 		Filename:  fileName,
