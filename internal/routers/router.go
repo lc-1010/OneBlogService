@@ -2,6 +2,7 @@ package routers
 
 import (
 	v1 "github.com/lc-1010/OneBlogService/internal/routers/api/v1"
+	"github.com/lc-1010/OneBlogService/internal/routers/ping"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,6 +14,14 @@ func NewRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 	article := v1.NewArticle()
 	tags := v1.NewTag()
+
+	ping := ping.NewPing()
+
+	p := r.Group("/test")
+	{
+		p.GET("/ping", ping.Pong)
+	}
+
 	apiv1 := r.Group("/api/v1")
 	{
 		//tags
