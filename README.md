@@ -61,3 +61,56 @@ CREATE TABLE `blog_article` (
         PRIMARY KEY (`id`)
    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章关联标签'; 
 ```
+
+
+## 建立model 
+
+每个表对应的model struct 结构
+```
+internal/modle
+.
+├── article.go
+├── article_tag.go
+├── model.go
+└── tag.go
+```
+
+## 定义路由和handler 
+
+```
+.
+├── api //handler
+│   └── v1
+│       ├── article.go
+│       └── tag.go
+└── router.go
+```
+`go run main.go` 
+路由注册成功
+
+```shell
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:   export GIN_MODE=release
+ - using code:  gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/tags              --> blog-server/internal/routers/api/v1.Tag.Create-fm (3 handlers)
+[GIN-debug] DELETE /api/v1/tags/:id          --> blog-server/internal/routers/api/v1.Tag.Delete-fm (3 handlers)
+[GIN-debug] PUT    /api/v1/tags/:id          --> blog-server/internal/routers/api/v1.Tag.Update-fm (3 handlers)
+[GIN-debug] PATCH  /api/v1/tags/:id/state    --> blog-server/internal/routers/api/v1.Tag.Update-fm (3 handlers)
+[GIN-debug] GET    /api/v1/tags              --> blog-server/internal/routers/api/v1.Tag.List-fm (3 handlers)
+[GIN-debug] POST   /api/v1/articles          --> blog-server/internal/routers/api/v1.Article.Create-fm (3 handlers)
+[GIN-debug] GET    /api/v1/articles          --> blog-server/internal/routers/api/v1.Article.List-fm (3 handlers)
+[GIN-debug] GET    /api/v1/articles/:id      --> blog-server/internal/routers/api/v1.Article.Get-fm (3 handlers)
+[GIN-debug] PATCH  /api/v1/articles/:id/state --> blog-server/internal/routers/api/v1.Article.Update-fm (3 handlers)
+[GIN-debug] PUT    /api/v1/articles/:id      --> blog-server/internal/routers/api/v1.Article.Update-fm (3 handlers)
+[GIN-debug] DELETE /api/v1/articles/:id      --> blog-server/internal/routers/api/v1.Article.Delete-fm (3 handlers)
+
+```
+
+## 公共组建
+- 错误
+- 配置
+- 数据库连接
+- 日志写入
+- 响应处理

@@ -1,4 +1,4 @@
-package modle
+package model
 
 type BlogArticleTag struct {
 	*Model
