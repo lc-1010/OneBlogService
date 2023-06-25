@@ -2,9 +2,11 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	_ "github.com/lc-1010/OneBlogService/docs"
+	_ "github.com/lc-1010/OneBlogService/docs" // 必须引入不然找不到文件
 	v1 "github.com/lc-1010/OneBlogService/internal/routers/api/v1"
 	"github.com/lc-1010/OneBlogService/internal/routers/ping"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // NewRouter tags articles curd
@@ -38,5 +40,9 @@ func NewRouter() *gin.Engine {
 		apiv1.PUT("/articles/:id", article.Update)
 		apiv1.DELETE("/articles/:id", article.Delete)
 	}
+
+	// swag router
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	return r
 }
