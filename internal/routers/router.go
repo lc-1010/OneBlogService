@@ -1,10 +1,10 @@
 package routers
 
 import (
+	"github.com/gin-gonic/gin"
+	_ "github.com/lc-1010/OneBlogService/docs"
 	v1 "github.com/lc-1010/OneBlogService/internal/routers/api/v1"
 	"github.com/lc-1010/OneBlogService/internal/routers/ping"
-
-	"github.com/gin-gonic/gin"
 )
 
 // NewRouter tags articles curd

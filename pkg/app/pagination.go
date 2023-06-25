@@ -4,8 +4,8 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/lc-1010/OneBlogService/convert"
 	"github.com/lc-1010/OneBlogService/global"
+	"github.com/lc-1010/OneBlogService/pkg/convert"
 )
 
 func GetPage(c *gin.Context) int {
