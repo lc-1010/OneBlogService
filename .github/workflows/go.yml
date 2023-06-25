@@ -9,6 +9,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  DB_DATABASE: blog_service
+  DB_USER: root
+  DB_PASSWORD: root
+
 jobs:
 
   build:
@@ -20,6 +25,11 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 1.19
+
+    - name: "Mysql Setup"
+      run : |
+        sudo /etc/init.d/mysql start
+        mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
 
     - name: Build
       run: go build -v ./...
