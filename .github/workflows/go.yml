@@ -12,7 +12,7 @@ on:
 env:
   DB_DATABASE: blog_service
   DB_USER: root
-  DB_PASSWORD: 123456
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
 jobs:
 
