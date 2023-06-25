@@ -26,11 +26,16 @@ jobs:
       with:
         go-version: 1.19
 
-    - name: "Mysql Setup"
-      run : |
-        sudo /etc/init.d/mysql start
-       
-
+    - name: Set up MySQL client
+      uses: docker://mysql:8.0.26
+      with:
+        args: >
+          --protocol=tcp
+          --port=3306
+          --host=localhost
+          -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }}
+          -e MYSQL_DATABASE=${{ env.DB_DATABASE }} 
+    
     - name: Build
       run: go build -v ./...
 
