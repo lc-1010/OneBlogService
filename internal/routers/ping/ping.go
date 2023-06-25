@@ -1,8 +1,9 @@
 package ping
 
 import (
-	"blog-server/global"
 	"net/http"
+
+	"github.com/lc-1010/OneBlogService/global"
 
 	"github.com/gin-gonic/gin"
 )

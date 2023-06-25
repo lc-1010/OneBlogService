@@ -2,9 +2,10 @@
 package v1
 
 import (
-	"blog-server/global"
 	"fmt"
 	"net/http"
+
+	"github.com/lc-1010/OneBlogService/global"
 
 	"github.com/lc-1010/OneBlogService/internal/model"
 
