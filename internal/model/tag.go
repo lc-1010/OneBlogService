@@ -1,5 +1,7 @@
 package model
 
+import "github.com/lc-1010/OneBlogService/pkg/app"
+
 type BlogTag struct {
 	*Model
 	Name  string `json:"name"`
@@ -15,4 +17,9 @@ type UpdateTagRequest struct {
 	State     int    `json:"state,omitempty" binding:"oneof=0 1,default=1"` // 标签状态
 	CreatedBy string `json:"created_by,omitempty" binding:"min=3,max=100"`  // 创建者
 	TAGID     uint32 `json:"id,omitempty"`                                  // 文章id"
+}
+
+type TagSwagger struct {
+	List  []*BlogTag
+	Pager *app.Pager
 }

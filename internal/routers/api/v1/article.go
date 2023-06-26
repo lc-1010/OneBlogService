@@ -35,7 +35,7 @@ func (t Article) Get(c *gin.Context) {}
 // @Param tag_id query int false "标签ID"
 // @Param page query int false "页码"
 // @Param paage_size query int false "每页数量"
-// @Success 200 {object} model.BlogArticle "成功"
+// @Success 200 {object} model.ArticleSwagger "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "请求错误"
 // @Router /api/v1/articles [get]

@@ -1,5 +1,23 @@
 definitions:
+  app.Pager:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_rows:
+        type: integer
+    type: object
   errcode.Error:
+    type: object
+  model.ArticleSwagger:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/model.BlogArticle'
+        type: array
+      pager:
+        $ref: '#/definitions/app.Pager'
     type: object
   model.BlogArticle:
     properties:
@@ -64,6 +82,15 @@ definitions:
       state:
         type: integer
     type: object
+  model.TagSwagger:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/model.BlogTag'
+        type: array
+      pager:
+        $ref: '#/definitions/app.Pager'
+    type: object
 info:
   contact: {}
 paths:
@@ -120,7 +147,7 @@ paths:
         "200":
           description: 成功
           schema:
-            $ref: '#/definitions/model.BlogArticle'
+            $ref: '#/definitions/model.ArticleSwagger'
         "400":
           description: 请求错误
           schema:
@@ -311,7 +338,7 @@ paths:
         "200":
           description: 成功
           schema:
-            $ref: '#/definitions/model.BlogTag'
+            $ref: '#/definitions/model.TagSwagger'
         "400":
           description: 请求错误
           schema:

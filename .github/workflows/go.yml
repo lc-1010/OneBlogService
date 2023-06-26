@@ -1,6 +1,3 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
 name: Go
 
 on:
@@ -12,19 +9,18 @@ on:
 env:
   DB_DATABASE: blog_service
   DB_USER: root
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
 jobs:
 
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
     - name: Set up Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v2
       with:
-        go-version: 1.19
+        go-version: 1.16
 
     - name: Set up MySQL client
       uses: docker://mysql:8.0.26
@@ -32,9 +28,9 @@ jobs:
         args: >
           --protocol=tcp
           --port=3306
-          --host=localhost
-          -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }}
-          -e MYSQL_DATABASE=${{ env.DB_DATABASE }} 
+          --host=mysql
+          -e MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          -e MYSQL_DATABASE: ${{ env.DB_DATABASE }} 
     
     - name: Build
       run: go build -v ./...

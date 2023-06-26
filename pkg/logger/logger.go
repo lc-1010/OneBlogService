@@ -80,6 +80,22 @@ func (l *Logger) WithFields(f Fields) *Logger {
 func (l *Logger) WithContext(ctx context.Context) *Logger {
 	ll := l.clone()
 	ll.ctx = ctx
+	c := ll.ctx.(*gin.Context)
+	traceID := c.Request.Header.Get("X-Trace-ID")
+	spanID := c.Request.Header.Get("X-Span-ID")
+	// 如果 X-Trace-ID 和 X-Span-ID 不存在，则生成新的值
+	if traceID == "" {
+		traceID = uuid.New().String()
+		c.Request.Header.Set("X-Trace-ID", traceID)
+	}
+	if spanID == "" {
+		spanID = uuid.New().String()
+		c.Request.Header.Set("X-Span-ID", spanID)
+
+	}
+	c.Set("X-Trace-ID", traceID)
+	c.Set("X-Span-ID", spanID)
+
 	return ll
 }
 

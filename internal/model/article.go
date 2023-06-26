@@ -1,5 +1,7 @@
 package model
 
+import "github.com/lc-1010/OneBlogService/pkg/app"
+
 type BlogArticle struct {
 	*Model
 	Title string `json:"title"`
@@ -35,4 +37,9 @@ type UpdateArticle struct {
 	State         uint8  `json:"state,omitempty"`  // 状态"`
 	ModifiedBy    string `json:"modified_by"`      //"修改人"
 
+}
+
+type ArticleSwagger struct {
+	List  []*BlogArticle
+	Pager *app.Pager
 }
