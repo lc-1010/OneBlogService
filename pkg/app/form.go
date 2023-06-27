@@ -8,6 +8,7 @@ import (
 	val "github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 	zh_translations "github.com/go-playground/validator/v10/translations/zh"
+	"github.com/lc-1010/OneBlogService/pkg/errcode"
 )
 
 type ValidError struct {
@@ -17,6 +18,12 @@ type ValidError struct {
 
 type ValidErrors []*ValidError
 
+func NewValidError(message string) *ValidError {
+	return &ValidError{
+		Key:     errcode.InvalidParams.Error(),
+		Message: message,
+	}
+}
 func (v *ValidError) Error() string {
 	return v.Message
 }
@@ -36,8 +43,15 @@ func (v ValidErrors) Errors() []string {
 // BindAndValid 将错误返回到封装好的error中
 func BindAndValid(c *gin.Context, v any) (bool, ValidErrors) {
 	var errs ValidErrors
+
 	// 绑定校验
-	err := c.ShouldBind(v)
+	var err error
+	if c.Request.Method == "DELETE" {
+		err = c.ShouldBindUri(v)
+	} else {
+		err = c.ShouldBind(v)
+	}
+
 	if err != nil {
 		locale := c.GetHeader("locale")
 		v := c.Value("validator").(*val.Validate)
@@ -47,9 +61,11 @@ func BindAndValid(c *gin.Context, v any) (bool, ValidErrors) {
 		}
 		trans, _ := uni.GetTranslator(locale)
 		verrs, ok := err.(val.ValidationErrors)
+
 		if !ok {
-			return false, errs
+			return false, ValidErrors{NewValidError(err.Error())}
 		}
+
 		switch locale {
 		case "zh":
 			_ = zh_translations.RegisterDefaultTranslations(v, trans)
@@ -59,6 +75,7 @@ func BindAndValid(c *gin.Context, v any) (bool, ValidErrors) {
 			_ = zh_translations.RegisterDefaultTranslations(v, trans)
 		}
 		for key, value := range verrs.Translate(trans) {
+
 			errs = append(errs, &ValidError{
 				Key:     key,
 				Message: value,

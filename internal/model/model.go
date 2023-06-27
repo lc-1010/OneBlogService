@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/lc-1010/OneBlogService/global"
 	"github.com/lc-1010/OneBlogService/pkg/setting"
@@ -15,9 +16,9 @@ type Model struct {
 	// id
 	ID uint32 `gorm:"primary_key" json:"id"`
 	// 创建时间
-	CratedOn uint32 `json:"crated_on"`
+	CreatedOn uint32 `json:"created_on"`
 	// 创建人
-	CratedBy string `json:"crated_by"`
+	CreatedBy string `json:"created_by"`
 	// 修改时间
 	ModifiedOn uint32 `json:"modified_on"`
 	// 修改人
@@ -53,4 +54,31 @@ func NewDBEngine(dbsetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 	DB.SetMaxIdleConns(dbsetting.MaxIdleConns)
 	DB.SetMaxOpenConns(dbsetting.MaxOpenConns)
 	return db, nil
+}
+
+/**************use hook *******/
+// 初始化在update 时 &BlogTag{ Mode :&model{}}
+
+func (t *Model) BeforeUpdate(db *gorm.DB) error {
+	nowTime := time.Now().Unix()
+
+	t.ModifiedOn = uint32(nowTime)
+
+	return nil
+}
+
+func (t *Model) BeforeCreate(db *gorm.DB) error {
+	nowTime := time.Now().Unix()
+
+	t.CreatedOn = uint32(nowTime)
+
+	return nil
+}
+
+func (t *Model) BeforeDelete(db *gorm.DB) error {
+	nowTime := time.Now().Unix()
+
+	t.DeletedOn = uint32(nowTime)
+
+	return nil
 }
