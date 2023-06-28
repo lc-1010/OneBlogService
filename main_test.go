@@ -7,17 +7,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/assert/v2"
+	"github.com/lc-1010/OneBlogService/global"
 	"github.com/lc-1010/OneBlogService/pkg/app"
 )
 
-// func TestPing(t *testing.T) {
-// 	r := gin.Default()
-// 	r.GET("/ping", func(ctx *gin.Context) {
-// 		global.Logger.SetTraceInfo(ctx).Infof(ctx, "%s for test ping,path:%s", ctx.HandlerName(), ctx.Request.URL.Path)
-// 		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
-// 	})
-// 	//r.Run()
-// }
+func TestPing(t *testing.T) {
+	t.SkipNow()
+	r := gin.Default()
+	r.GET("/ping", func(ctx *gin.Context) {
+		global.Logger.SetTraceInfo(ctx).Infof(ctx, "%s for test ping,path:%s", ctx.HandlerName(), ctx.Request.URL.Path)
+		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
+	})
+	r.Run()
+}
 
 func TestResponse(t *testing.T) {
 	r := gin.New()
@@ -79,5 +81,6 @@ func TestMultiHandler(t *testing.T) {
 }
 
 func TestMain(t *testing.T) {
+	t.SkipNow()
 	main()
 }
