@@ -14,7 +14,7 @@ type FileInfo struct {
 	AccessUrl string
 }
 
-type UploadParams struct {
+type UploadRequest struct {
 	FormName     string `json:"file,omitempty"`
 	FormFileType string `json:"type,omitempty"`
 }

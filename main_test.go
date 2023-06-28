@@ -77,3 +77,7 @@ func TestMultiHandler(t *testing.T) {
 	assert.Equal(t, w.Body.String(), exp)
 
 }
+
+func TestMain(t *testing.T) {
+	main()
+}

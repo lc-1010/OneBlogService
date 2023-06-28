@@ -48,6 +48,10 @@ func NewRouter() *gin.Engine {
 	upload := api.NewUpload()
 	r.POST("/upload/file", upload.UploadFile)
 	r.StaticFS("/static", http.Dir(global.AppSetting.UploadSavePath))
+
+	// auth
+	r.POST("/auth", api.GetAuth)
+
 	//ping test
 	p := r.Group("/test")
 	{
@@ -56,6 +60,7 @@ func NewRouter() *gin.Engine {
 
 	// api router
 	apiv1 := r.Group("/api/v1")
+	apiv1.Use(middleware.JWT())
 	{
 		//tags
 		apiv1.POST("/tags", tags.Create)

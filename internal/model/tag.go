@@ -68,7 +68,7 @@ func (t BlogTag) Create(db *gorm.DB) error {
 func (t BlogTag) CheckName(db *gorm.DB) (BlogTag, error) {
 	var tag BlogTag
 	err := db.Where("name = ?", t.Name).First(&tag).Error
-	if err != nil {
+	if err != nil && err != gorm.ErrRecordNotFound {
 		return tag, err
 	}
 	return tag, nil
@@ -93,7 +93,7 @@ func (t BlogTag) Get(db *gorm.DB) (BlogTag, error) {
 	var tag BlogTag
 	err := db.Where("id = ? and is_del = ? and state = ?",
 		t.ID, t.IsDel, t.State).First(&tag).Error
-	if err != nil {
+	if err != nil && err != gorm.ErrRecordNotFound {
 		return tag, err
 	}
 	return tag, nil

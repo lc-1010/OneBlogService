@@ -17,7 +17,7 @@ func NewUpload() Upload {
 }
 
 func (u Upload) UploadFile(c *gin.Context) {
-	param := service.UploadParams{
+	param := service.UploadRequest{
 		FormName:     "file",
 		FormFileType: "type",
 	}

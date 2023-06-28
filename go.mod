@@ -3,6 +3,7 @@ module github.com/lc-1010/OneBlogService
 go 1.20
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/assert/v2 v2.2.0
 	github.com/go-playground/locales v0.14.1

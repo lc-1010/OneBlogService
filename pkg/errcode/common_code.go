@@ -29,7 +29,7 @@ var (
 	ServerError                = NewError(1000000, "Server Error")
 	InvalidParams              = NewError(1000001, "Invalid Params")
 	NotFound                   = NewError(1000002, "Not Found")
-	UnauthoerizedTokeExists    = NewError(1000003, "UnauthoerizedTokeExists")
+	UnauthorizedAuthNotExist   = NewError(1000003, "UnauthoerizedTokeExists")
 	UnauthoerizedTokenError    = NewError(1000004, "Unauthoerized Token Error")
 	UnauthoerizedTokenTimeout  = NewError(1000005, "Unauthoerized Token Timeout")
 	UnauthoerizedTokenGenerate = NewError(1000006, "Unauthoerized Token Generate")
@@ -73,7 +73,7 @@ func (e *Error) StatusCode() int {
 		return http.StatusInternalServerError
 	case InvalidParams.Code():
 		return http.StatusBadRequest
-	case UnauthoerizedTokeExists.Code():
+	case UnauthorizedAuthNotExist.Code():
 		fallthrough
 	case UnauthoerizedTokenError.Code():
 		fallthrough
