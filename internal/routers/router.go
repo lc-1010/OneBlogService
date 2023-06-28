@@ -1,6 +1,8 @@
 package routers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/en"
@@ -10,7 +12,9 @@ import (
 	validator "github.com/go-playground/validator/v10"
 
 	_ "github.com/lc-1010/OneBlogService/docs" // 必须引入不然找不到文件
+	"github.com/lc-1010/OneBlogService/global"
 	"github.com/lc-1010/OneBlogService/internal/middleware"
+	"github.com/lc-1010/OneBlogService/internal/routers/api"
 	v1 "github.com/lc-1010/OneBlogService/internal/routers/api/v1"
 	"github.com/lc-1010/OneBlogService/internal/routers/ping"
 	swaggerFiles "github.com/swaggo/files"
@@ -40,12 +44,17 @@ func NewRouter() *gin.Engine {
 	tags := v1.NewTag()
 
 	ping := ping.NewPing()
-
+	//upload image
+	upload := api.NewUpload()
+	r.POST("/upload/file", upload.UploadFile)
+	r.StaticFS("/static", http.Dir(global.AppSetting.UploadSavePath))
+	//ping test
 	p := r.Group("/test")
 	{
 		p.GET("/ping", ping.Pong)
 	}
 
+	// api router
 	apiv1 := r.Group("/api/v1")
 	{
 		//tags

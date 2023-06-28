@@ -7,4 +7,5 @@ var (
 	ErrorDeleteTagFail  = NewError(20010004, "删除标签失败")
 	ErrorCountTagFail   = NewError(20010005, "统计标签失败")
 	ErrorCrateTagExists = NewError(20010006, "标签已存在")
+	ErrorUploadFileFail = NewError(20030001, "上传文件失败")
 )

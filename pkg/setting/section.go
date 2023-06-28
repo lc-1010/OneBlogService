@@ -48,6 +48,11 @@ type DatabaseSettingS struct {
 	ParseTime    bool
 	MaxIdleConns int
 	MaxOpenConns int
+	// upload image
+	UploadSavePath       string
+	UploadServerUrl      string
+	UploadImageMaxSize   int
+	UpdateImageAllowExts []string
 }
 
 var sections = make(map[string]any)
