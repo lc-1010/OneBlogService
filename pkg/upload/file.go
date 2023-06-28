@@ -2,7 +2,7 @@ package upload
 
 import (
 	"io"
-	"io/ioutil"
+
 	"mime/multipart"
 	"os"
 	"path"
@@ -12,21 +12,32 @@ import (
 	"github.com/lc-1010/OneBlogService/pkg/util"
 )
 
+// FileType for upload file type
 type FileType int
 
 const (
+	// TypeImage for image type
 	TypeImage FileType = iota + 1
+	// TypeExcel for excel type
 	TypeExcel
+	// TypeTxt for txt type
 	TypeTxt
 )
 
+// GetFileExt returns the file extension of the given name.
+//
+// name: the name of the file.
+// Returns: the file extension as a string.
 func GetFileExt(name string) string {
 	return path.Ext(name)
 }
 
+// GetSavePath return save path
 func GetSavePath() string {
 	return global.AppSetting.UploadSavePath
 }
+
+// CheckSavePath check save path
 func CheckSavePath(dst string) bool {
 	_, err := os.Stat(dst)
 	return os.IsNotExist(err)
@@ -40,6 +51,12 @@ func GetFileNmae(name string) string {
 	return fileName + ext
 }
 
+// CheckAllowExt checks if the given file type is allowed based on the file extension.
+//
+// It takes two parameters: t, which is the FileType enum that represents the type of the file,
+// and name, which is the string representing the name of the file.
+//
+// It returns a boolean value indicating whether the file type is allowed or not.
 func CheckAllowExt(t FileType, name string) bool {
 	ext := GetFileExt(name)
 	ext = strings.ToUpper(ext)
@@ -54,8 +71,12 @@ func CheckAllowExt(t FileType, name string) bool {
 	return false
 }
 
+// CheckOverMaxSize checks if the size of the file is over the maximum allowed size.
+//
+// It takes two parameters: t FileType and f multipart.File.
+// It returns a boolean indicating whether the size is over the maximum allowed size.
 func CheckOverMaxSize(t FileType, f multipart.File) bool {
-	content, _ := ioutil.ReadAll(f)
+	content, _ := io.ReadAll(f)
 	size := len(content)
 	switch t {
 	case TypeImage:
@@ -66,6 +87,12 @@ func CheckOverMaxSize(t FileType, f multipart.File) bool {
 	return false
 }
 
+// CreateSavePath creates a directory at the given destination path with the specified permissions.
+//
+// Parameters:
+// - dst: the destination path where the directory will be created.
+// - perm: the permissions to be set for the created directory.
+// Return type: error.
 func CreateSavePath(dst string, perm os.FileMode) error {
 	err := os.MkdirAll(dst, perm)
 	if err != nil {
@@ -74,11 +101,20 @@ func CreateSavePath(dst string, perm os.FileMode) error {
 	return nil
 }
 
+// CheckPermission checks if the given destination has proper permission.
+//
+// dst: the destination to check permission for.
+// bool: true if the permission is granted, false otherwise.
 func CheckPermission(dst string) bool {
 	_, err := os.Stat(dst)
 	return os.IsPermission(err)
 }
 
+// SaveFile saves a file to the specified destination.
+//
+// It takes a *multipart.FileHeader as the file to be saved and a string
+// 'dst' as the destination path. It returns an error if any error occurs
+// during the process.
 func SaveFile(file *multipart.FileHeader, dst string) error {
 	src, err := file.Open()
 	if err != nil {

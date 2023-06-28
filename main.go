@@ -26,7 +26,10 @@ func main() {
 		WriteTimeout:   global.ServerSetting.WriteTimeout, //10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	s.ListenAndServe()
+	err := s.ListenAndServe()
+	if err != nil {
+		log.Fatalf("s.ListenAndServe err:%v", err)
+	}
 }
 
 func init() {

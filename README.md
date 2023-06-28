@@ -1,4 +1,5 @@
 [![Build Status](https://github.com/lc-1010/OneBlogService/workflows/Go/badge.svg)](https://github.com/lc-1010/OneBlogService/actions)[![Go Report Card](https://goreportcard.com/badge/github.com/lc-1010/OneBlogService)](https://goreportcard.com/report/github.com/lc-1010/OneBlogService)
+
 # OneBlogService
 
 
@@ -7,7 +8,7 @@
 - CREATE DATABASE
 ```sql
 CREATE DATABASE
-IF NOT EXISTS blog_service DEFAULT CHARACTER 
+IF NOT EXISTS blog_service DEFAULT CHARACTER
 SET utf8mb4 DEFAULT COLLATE utf8mb4_general_ci;
 ```
 - 公共字段
@@ -29,12 +30,12 @@ CREATE TABLE `blog_tag` (
     `modified_on` int(10) unsigned DEFAULT '0' COMMENT '修改时间',
     `modified_by` varchar(100) DEFAULT '' COMMENT '修改人',
     `deleted_on` int(10) unsigned DEFAULT '0' COMMENT '删除时间',
-    `is_del` tinyint(3) unsigned DEFAULT '0' COMMENT '是否删除 0 未删 ， 1 已删', 
+    `is_del` tinyint(3) unsigned DEFAULT '0' COMMENT '是否删除 0 未删 ， 1 已删',
     `state` tinyint(3) unsigned DEFAULT '1' COMMENT '状态 0 禁用，1 启用',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='标签管理';
 ```
-- blog_article 
+- blog_article
 ```sql
 CREATE TABLE `blog_article` (
     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -50,19 +51,19 @@ CREATE TABLE `blog_article` (
     `is_del` tinyint(3) unsigned DEFAULT '0' COMMENT '是否删除 0 未删 ， 1 已删',
      `state` tinyint(3) unsigned DEFAULT '1' COMMENT '状态 0 禁用，1 启用',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章管理'; 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章管理';
 ```
 
 - blog_article_tag
-```sql 
+```sql
    CREATE TABLE `blog_article_tag` (
      `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
       `article_id` int(11)   NOT NULL COMMENT '文章ID',
        `tag_id` int(11)   NOT NULL COMMENT '文章ID',
         PRIMARY KEY (`id`)
-   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章关联标签'; 
+   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章关联标签';
 ```
-- blog_auth 
+- blog_auth
 ```sql
 CREATE TABLE `blog_auth` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -78,7 +79,7 @@ CREATE TABLE `blog_auth` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT="认证管理"
 ```
 
-## 建立model 
+## 建立model
 
 每个表对应的model struct 结构
 ```
@@ -90,7 +91,7 @@ internal/modle
 └── tag.go
 ```
 
-## 定义路由和handler 
+## 定义路由和handler
 
 ```
 .
@@ -100,7 +101,7 @@ internal/modle
 │       └── tag.go
 └── router.go
 ```
-`go run main.go` 
+`go run main.go`
 路由注册成功
 
 ```shell

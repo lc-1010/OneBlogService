@@ -18,7 +18,8 @@ func TestPing(t *testing.T) {
 		global.Logger.SetTraceInfo(ctx).Infof(ctx, "%s for test ping,path:%s", ctx.HandlerName(), ctx.Request.URL.Path)
 		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
-	r.Run()
+	_ = r.Run()
+
 }
 
 func TestResponse(t *testing.T) {
