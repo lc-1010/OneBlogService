@@ -52,7 +52,7 @@ func init() {
 
 // setupSetting
 func setupSetting() error {
-	setting, err := setting.NewSetting()
+	setting, err := setting.NewSetting("")
 	if err != nil {
 		return err
 	}
@@ -69,6 +69,10 @@ func setupSetting() error {
 		return err
 	}
 	err = setting.ReadSection("JWT", &global.JWTSetting)
+	if err != nil {
+		return err
+	}
+	err = setting.ReadSection("Email", &global.EmailSettings)
 	if err != nil {
 		return err
 	}

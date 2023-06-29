@@ -8,6 +8,7 @@ import (
 	"github.com/lc-1010/OneBlogService/pkg/errcode"
 )
 
+// GetAuth returns the authentication model for the given app key and app secret.
 func GetAuth(c *gin.Context) {
 	param := service.AuthRequest{}
 
@@ -26,7 +27,7 @@ func GetAuth(c *gin.Context) {
 		response.ToErrorResponse(errcode.UnauthorizedAuthNotExist)
 		return
 	}
-	token, err := app.GenerateToken(param.Appkey, param.AppSercet)
+	token, err := app.GenerateToken(param.Appkey, param.AppSecret)
 	if err != nil {
 		global.Logger.Errorf(c, "svc.GenerateToken errs :%v", errs)
 		response.ToErrorResponse(errcode.UnauthoerizedTokenGenerate)

@@ -31,3 +31,12 @@ JWT:
   Secret: 2301a11ba8c311876c058340e7521995
   Issuer: blog-service
   Expire: 7200
+Email:
+  Host: smtp.qq.com
+  Port: 465
+  UserName: xxx
+  Password: xxx
+  IsSSL: true
+  From: xxx
+  To:
+    - xxx

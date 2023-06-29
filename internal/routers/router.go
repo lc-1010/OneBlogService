@@ -2,6 +2,7 @@ package routers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -17,12 +18,23 @@ import (
 	"github.com/lc-1010/OneBlogService/internal/routers/api"
 	v1 "github.com/lc-1010/OneBlogService/internal/routers/api/v1"
 	"github.com/lc-1010/OneBlogService/internal/routers/ping"
+	"github.com/lc-1010/OneBlogService/pkg/limiter"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var v *validator.Validate
 var uni *ut.UniversalTranslator
+
+// methodLimiters
+var methodLimiters = limiter.NewMethodLimiter().AddBucket(
+	limiter.LimiterBucketRule{
+		Key:          "/auth",
+		FillInterval: time.Second,
+		Capacity:     10,
+		Quantum:      10,
+	},
+)
 
 func init() {
 	// 初始化语言设置
@@ -34,15 +46,21 @@ func init() {
 // NewRouter tags articles curd
 func NewRouter() *gin.Engine {
 	r := gin.New()
-	//中间件
+	// middleware 中间件
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	//r.Use(middleware.Recovery())
+	//r.Use(middleware.AccessLog())
+	// Translate
 	r.Use(middleware.TranslateSet(uni, v))
+	// limiter
+	r.Use(middleware.Limiter(methodLimiters))
 
-	//路由
+	// 业务路由
 	article := v1.NewArticle()
 	tags := v1.NewTag()
 
+	// test
 	ping := ping.NewPing()
 	//upload image
 	upload := api.NewUpload()
@@ -51,7 +69,6 @@ func NewRouter() *gin.Engine {
 
 	// auth
 	r.POST("/auth", api.GetAuth)
-
 	//ping test
 	p := r.Group("/test")
 	{
