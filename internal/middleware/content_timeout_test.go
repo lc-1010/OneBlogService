@@ -22,13 +22,17 @@ import (
 // It does not take any parameters and does not return any values.
 func TestContextTimeout(t *testing.T) {
 	r := gin.Default()
-
+	ts := httptest.NewServer(r)
 	// 增加中间件
-	r.Use(ContextTimeout(5 * time.Second))
+	r.Use(ContextTimeout(3 * time.Second))
 	// 创建一个测试路由
+	r.GET("/timeout", func(c *gin.Context) {
+		time.Sleep(10 * time.Second)
+		c.String(http.StatusOK, "OK~")
+	})
 	r.GET("/test", func(c *gin.Context) {
 		//访问不能访问的地址
-		_, err := ctxhttp.Get(c.Request.Context(), http.DefaultClient, "https://www.google.com/")
+		_, err := ctxhttp.Get(c.Request.Context(), http.DefaultClient, ts.URL+"/timeout")
 		if err != nil {
 			c.String(http.StatusInternalServerError, err.Error())
 		}
@@ -36,7 +40,7 @@ func TestContextTimeout(t *testing.T) {
 
 	t.Run("Test timeout with valid duration", func(t *testing.T) {
 		// Set up test case
-		req, _ := http.NewRequest("GET", "/test", nil)
+		req, _ := http.NewRequest("GET", ts.URL+"/test", nil)
 		w := httptest.NewRecorder()
 
 		// Execute the test case
@@ -46,5 +50,38 @@ func TestContextTimeout(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 		assert.Equal(t, context.DeadlineExceeded.Error(), w.Body.String())
 	})
-
+	ts.Close()
 }
+
+// 创建一个新的 HTTP 客户端
+// 	client := &http.Client{
+// 		Transport: &http.Transport{
+// 			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+// 				return net.DialTimeout(network, addr, 3*time.Second)
+// 			},
+// 		},
+// 	}
+// 	// 使用新的客户端发送请求
+// 	_, err := ctxhttp.Get(c.Request.Context(), client, "/timeout")
+// 	if err != nil {
+// 		c.String(http.StatusInternalServerError, err.Error())
+// 	}
+// })
+
+// select time.AfterFunc(1*time.Second, func() {
+
+//})
+// req, _ := http.NewRequest("GET", "/test", nil)
+// w := httptest.NewRecorder()
+
+// // Execute the test case with shorter timeout
+// timer := time.AfterFunc(1*time.Second, func() {
+// 	r.ServeHTTP(w, req)
+// })
+
+// // Verify the result
+// select {
+// case <-timer.C:
+// 	assert.Equal(t, http.StatusInternalServerError, w.Code)
+// 	assert.Equal(t, context.DeadlineExceeded.Error(), w.Body.String())
+// }
