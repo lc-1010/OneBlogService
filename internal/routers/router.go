@@ -46,15 +46,21 @@ func init() {
 // NewRouter tags articles curd
 func NewRouter() *gin.Engine {
 	r := gin.New()
-	// middleware 中间件
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
-	//r.Use(middleware.Recovery())
-	//r.Use(middleware.AccessLog())
+	if global.ServerSetting.RunMode == "debug" {
+		// middleware 中间件
+		r.Use(gin.Logger())
+		r.Use(gin.Recovery())
+
+	} else {
+		r.Use(middleware.Recovery())
+		r.Use(middleware.AccessLog())
+	}
 	// Translate
 	r.Use(middleware.TranslateSet(uni, v))
 	// limiter
 	r.Use(middleware.Limiter(methodLimiters))
+	// context with timeout
+	r.Use(middleware.ContextTimeout(global.AppSetting.DefaultContextTimeout * time.Second))
 
 	// 业务路由
 	article := v1.NewArticle()
