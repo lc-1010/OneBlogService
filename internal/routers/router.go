@@ -61,7 +61,7 @@ func NewRouter() *gin.Engine {
 	r.Use(middleware.Limiter(methodLimiters))
 	// context with timeout
 	r.Use(middleware.ContextTimeout(global.AppSetting.DefaultContextTimeout * time.Second))
-
+	r.Use(middleware.Tracing())
 	// 业务路由
 	article := v1.NewArticle()
 	tags := v1.NewTag()
