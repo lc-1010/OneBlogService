@@ -1,8 +1,10 @@
 package global
 
-import "github.com/opentracing/opentracing-go"
+import (
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+)
 
 var (
-	// Tracer opentracing.Tracer
-	Tracer opentracing.Tracer
+	// Tracer opentelemetry tracesdk
+	Tracer *tracesdk.TracerProvider
 )

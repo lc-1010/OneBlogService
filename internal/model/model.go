@@ -42,6 +42,7 @@ func NewDBEngine(dbsetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if global.ServerSetting.RunMode == "debug" {
 		db.Logger.LogMode(logger.Info)
 	}
@@ -53,6 +54,7 @@ func NewDBEngine(dbsetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 
 	DB.SetMaxIdleConns(dbsetting.MaxIdleConns)
 	DB.SetMaxOpenConns(dbsetting.MaxOpenConns)
+
 	return db, nil
 }
 

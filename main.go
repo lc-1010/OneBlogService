@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"time"
@@ -113,13 +114,27 @@ func setupLogger() error {
 }
 
 func setupTracer() error {
-	jaegerTracer, _, err := tracer.NewJaegerTrancer(
+	tracerProvider, err := tracer.NewJaegerTrancer(
 		"blog",
-		"127.0.0.1:6931",
+		"127.0.0.1",
+		"6831",
 	)
 	if err != nil {
 		return err
 	}
-	global.Tracer = jaegerTracer
+	global.Tracer = tracerProvider
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	defer func(ctx context.Context, timeout time.Duration) {
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		if err := global.Tracer.Shutdown(ctx); err != nil {
+			log.Fatal(err)
+		}
+	}(ctx, global.ServerSetting.ReadTimeout)
+
+	tr := global.Tracer.Tracer("component-main")
+	_, span := tr.Start(ctx, "init")
+	defer span.End()
 	return nil
 }

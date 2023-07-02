@@ -82,6 +82,6 @@ func TestMultiHandler(t *testing.T) {
 }
 
 func TestMain(t *testing.T) {
-	t.SkipNow()
+	//t.SkipNow()
 	main()
 }
