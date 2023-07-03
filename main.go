@@ -40,6 +40,10 @@ func init() {
 	if err != nil {
 		log.Fatalf("init.setupSetting err:%v", err)
 	}
+	err = setupTracer()
+	if err != nil {
+		log.Fatalf("init.setupTracer err:%v", err)
+	}
 
 	err = setupDBEngine()
 	if err != nil {
@@ -50,10 +54,7 @@ func init() {
 	if err != nil {
 		log.Fatalf("init.setupLogger err:%v", err)
 	}
-	err = setupTracer()
-	if err != nil {
-		log.Fatalf("init.setupTracer err:%v", err)
-	}
+
 }
 
 // setupSetting
@@ -125,13 +126,14 @@ func setupTracer() error {
 	global.Tracer = tracerProvider
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	defer func(ctx context.Context, timeout time.Duration) {
-		ctx, cancel := context.WithTimeout(ctx, timeout)
-		defer cancel()
-		if err := global.Tracer.Shutdown(ctx); err != nil {
-			log.Fatal(err)
-		}
-	}(ctx, global.ServerSetting.ReadTimeout)
+	// defer func(ctx context.Context) {
+	// 	// Do not make the application hang when it is shutdown.
+	// 	ctx, cancel = context.WithTimeout(ctx, time.Second*5)
+	// 	defer cancel()
+	// 	if err := tracerProvider.Shutdown(ctx); err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }(ctx)
 
 	tr := global.Tracer.Tracer("component-main")
 	_, span := tr.Start(ctx, "init")

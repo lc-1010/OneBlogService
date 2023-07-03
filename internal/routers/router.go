@@ -84,7 +84,7 @@ func NewRouter() *gin.Engine {
 
 	// api router
 	apiv1 := r.Group("/api/v1")
-	apiv1.Use(middleware.JWT())
+	//apiv1.Use(middleware.JWT())
 	{
 		//tags
 		apiv1.POST("/tags", tags.Create)

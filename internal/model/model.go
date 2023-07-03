@@ -6,7 +6,7 @@ import (
 
 	"github.com/lc-1010/OneBlogService/global"
 	"github.com/lc-1010/OneBlogService/pkg/setting"
-
+	"github.com/lc-1010/OneBlogService/pkg/tracer"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -42,6 +42,7 @@ func NewDBEngine(dbsetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	db.Use(tracer.NewBlogTrace())
 
 	if global.ServerSetting.RunMode == "debug" {
 		db.Logger.LogMode(logger.Info)
