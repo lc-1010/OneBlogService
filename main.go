@@ -2,8 +2,11 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"net/http"
+	"strings"
+	"testing"
 	"time"
 
 	"github.com/lc-1010/OneBlogService/global"
@@ -15,6 +18,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gopkg.in/natefinch/lumberjack.v2"
+)
+
+var (
+	port    string
+	runMode string
+	config  string
 )
 
 func main() {
@@ -35,8 +44,13 @@ func main() {
 }
 
 func init() {
-
-	err := setupSetting()
+	// 处理 flag provided but not defined: -test.paniconexit0
+	testing.Init() //或者把 flag.Parase放到 māin_中
+	err := setupFlag()
+	if err != nil {
+		log.Fatalf("init.setupFlag err:%v", err)
+	}
+	err = setupSetting()
 	if err != nil {
 		log.Fatalf("init.setupSetting err:%v", err)
 	}
@@ -59,7 +73,7 @@ func init() {
 
 // setupSetting
 func setupSetting() error {
-	setting, err := setting.NewSetting("")
+	setting, err := setting.NewSetting(strings.Split(config, ",")...)
 	if err != nil {
 		return err
 	}
@@ -88,6 +102,14 @@ func setupSetting() error {
 
 	global.ServerSetting.ReadTimeout *= time.Second
 	global.ServerSetting.WriteTimeout *= time.Second
+
+	// set run mode and port
+	if port != "" {
+		global.ServerSetting.HttpPort = port
+	}
+	if runMode != "" {
+		global.ServerSetting.RunMode = runMode
+	}
 	return nil
 }
 
@@ -138,5 +160,16 @@ func setupTracer() error {
 	tr := global.Tracer.Tracer("component-main")
 	_, span := tr.Start(ctx, "init")
 	defer span.End()
+	return nil
+}
+
+func setupFlag() error {
+	flag.StringVar(&port, "port", "8000", "启动端口")
+	flag.StringVar(&runMode, "mode", "debug", "启动模式")
+	flag.StringVar(&config, "config", "configs/", "指定配置文件路径")
+	if !flag.Parsed() {
+		flag.Parse()
+
+	}
 	return nil
 }

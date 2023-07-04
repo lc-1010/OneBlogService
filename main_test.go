@@ -11,6 +11,9 @@ import (
 	"github.com/lc-1010/OneBlogService/pkg/app"
 )
 
+func init() {
+	testing.Init()
+}
 func TestPing(t *testing.T) {
 	t.SkipNow()
 	r := gin.Default()
