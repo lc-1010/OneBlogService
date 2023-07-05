@@ -3,9 +3,13 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
@@ -24,23 +28,49 @@ var (
 	port    string
 	runMode string
 	config  string
+
+	isVersion    bool
+	buildTime    string
+	buildVersion string
+	gitCommitID  string
 )
 
+// go build -ldflags "-X main.buildTime=`date +%Y-%m-%d,%H:%M:%S` -X main.gitCommitID=`git rev-parse --short HEAD` -X main.buildVersion=1.0.0"
 func main() {
+	if isVersion {
+		fmt.Printf("build_time: %s\n", buildTime)
+		fmt.Printf("build_version: %s\n", buildVersion)
+		fmt.Printf("git_commit_id: %s\n", gitCommitID)
+	}
 	gin.SetMode(global.ServerSetting.RunMode)
 
 	router := routers.NewRouter()
 	s := &http.Server{
-		Addr:           ":" + global.ServerSetting.HttpPort,
+		Addr:           ":" + global.ServerSetting.HTTPPort,
 		Handler:        router,
 		ReadTimeout:    global.ServerSetting.ReadTimeout,  //10 * time.Second,
 		WriteTimeout:   global.ServerSetting.WriteTimeout, //10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	err := s.ListenAndServe()
-	if err != nil {
-		log.Fatalf("s.ListenAndServe err:%v", err)
+	go func() {
+		err := s.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			log.Fatalf("s.ListenAndServe err:%v", err)
+		}
+	}()
+
+	// 使用go channel 实现中断信号
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutdown Server ...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := s.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown:", err)
 	}
+	log.Println("Server exiting")
+
 }
 
 func init() {
@@ -105,7 +135,7 @@ func setupSetting() error {
 
 	// set run mode and port
 	if port != "" {
-		global.ServerSetting.HttpPort = port
+		global.ServerSetting.HTTPPort = port
 	}
 	if runMode != "" {
 		global.ServerSetting.RunMode = runMode
@@ -164,12 +194,14 @@ func setupTracer() error {
 }
 
 func setupFlag() error {
+
+	flag.BoolVar(&isVersion, "version", false, "show version")
+
 	flag.StringVar(&port, "port", "8000", "启动端口")
 	flag.StringVar(&runMode, "mode", "debug", "启动模式")
 	flag.StringVar(&config, "config", "configs/", "指定配置文件路径")
 	if !flag.Parsed() {
 		flag.Parse()
-
 	}
 	return nil
 }

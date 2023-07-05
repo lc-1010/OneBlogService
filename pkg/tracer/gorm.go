@@ -34,7 +34,7 @@ func (b BlogTrance) Initialize(db *gorm.DB) error {
 	// 注册 GORM 的回调钩子，用于创建和结束 OpenTelemetry 的 span
 	// db.Callback().Create().Before("gorm:create").Register("ot:create", createCallback)
 	//db.Callback().Update().Before("gorm:update").Register("ot:update", updateCallback)
-	db.Callback().Query().After("gorm:query").Register("ot:query", queryCallback)
+	_ = db.Callback().Query().After("gorm:query").Register("ot:query", queryCallback)
 
 	//db.Callback().Delete().Before("gorm:delete").Register("ot:delete", deleteCallback)
 	return nil

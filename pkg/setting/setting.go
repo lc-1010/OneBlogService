@@ -47,7 +47,7 @@ func (s *Setting) WatchSettingChange() {
 	go func() {
 		s.vp.WatchConfig()
 		s.vp.OnConfigChange(func(in fsnotify.Event) {
-			_ = s.ReloadAllSection()
+			_ = s.ReloadAllSection() //监听配置文件变化
 		})
 	}()
 }

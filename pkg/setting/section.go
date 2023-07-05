@@ -1,11 +1,13 @@
 package setting
 
-import "time"
+import (
+	"time"
+)
 
 // ServerSettingS Context from Code Snippet global/setting.go:package global
 type ServerSettingS struct {
 	RunMode      string
-	HttpPort     string
+	HTTPPort     string
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 }
@@ -19,7 +21,7 @@ type AppSettingS struct {
 	LogFileName           string
 	LogFileExt            string
 	UploadSavePath        string
-	UploadServerUrl       string
+	UploadServerURL       string
 	UploadImageMaxSize    int
 	UploadImageAllowExts  []string
 }
@@ -56,7 +58,7 @@ type DatabaseSettingS struct {
 	MaxOpenConns int
 	// upload image
 	UploadSavePath       string
-	UploadServerUrl      string
+	UploadServerURL      string
 	UploadImageMaxSize   int
 	UpdateImageAllowExts []string
 }
@@ -87,6 +89,7 @@ func (s Setting) ReloadAllSection() error {
 		if err != nil {
 			return err
 		}
+		//log.Printf("ReloadAllSection:k=%s v=%v\n", k, v)
 	}
 	return nil
 }

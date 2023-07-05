@@ -42,7 +42,10 @@ func NewDBEngine(dbsetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.Use(tracer.NewBlogTrace())
+	err = db.Use(tracer.NewBlogTrace())
+	if err != nil {
+		return nil, err
+	}
 
 	if global.ServerSetting.RunMode == "debug" {
 		db.Logger.LogMode(logger.Info)

@@ -43,7 +43,7 @@ func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File,
 	if err := upload.SaveFile(fileHeader, dst); err != nil {
 		return nil, err
 	}
-	accessUrl := global.AppSetting.UploadServerUrl + "/" + fileName
+	accessUrl := global.AppSetting.UploadServerURL + "/" + fileName
 
 	return &FileInfo{Name: fileName, AccessUrl: accessUrl}, nil
 }
