@@ -2,14 +2,16 @@ package model
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/lc-1010/OneBlogService/global"
 	"github.com/lc-1010/OneBlogService/pkg/setting"
-	"github.com/lc-1010/OneBlogService/pkg/tracer"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/plugin/opentelemetry/tracing"
 )
 
 type Model struct {
@@ -38,17 +40,32 @@ func NewDBEngine(dbsetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 		dbsetting.Charset,
 		dbsetting.ParseTime)
 
+	// loggerN := logger.New(
+	// 	logrus.NewWriter(),
+	// 	logger.Config{
+	// 		SlowThreshold: time.Millisecond,
+	// 		LogLevel:      logger.Warn,
+	// 		Colorful:      false,
+	// 	},
+	// )
+
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return nil, err
-	}
-	err = db.Use(tracer.NewBlogTrace())
 	if err != nil {
 		return nil, err
 	}
 
 	if global.ServerSetting.RunMode == "debug" {
 		db.Logger.LogMode(logger.Info)
+	}
+	// tracer
+
+	//err = db.Use(tracer.NewBlogTrace())
+	if err := db.Use(tracing.NewPlugin(tracing.WithTracerProvider(global.Tracer))); err != nil {
+		log.Fatal(err)
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	DB, err := db.DB()

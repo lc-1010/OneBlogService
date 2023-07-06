@@ -36,25 +36,33 @@ type DeleteTagRequest struct {
 /********Service ********/
 
 func (svc *Service) CountTag(param *ConutTagRequest) (int, error) {
-	return svc.dao.CountTag(param.Name, param.State)
+	return svc.dao.CountTag(svc.ctx, param.Name, param.State)
 }
+
 func (svc *Service) GetTagList(param *GetTagListRequest, pager *app.Pager) ([]*model.BlogTag, error) {
-	return svc.dao.GetTagList(param.Name, param.State, pager.Page, pager.PageSize)
+	return svc.dao.GetTagList(svc.ctx, param.Name, param.State, pager.Page, pager.PageSize)
 }
 
 func (svc *Service) CrateTag(param *CrateTagRquest) error {
-	tag, err := svc.dao.CheckName(param.Name)
+	find := svc.dao.CheckName(svc.ctx, param.Name)
+
+	if find {
+		return errcode.ErrorCrateTagExists
+	}
+	return svc.dao.CreateTag(svc.ctx, param.Name, param.State, param.CreatedBy)
+}
+
+func (svc *Service) DeleteTag(param *DeleteTagRequest) error {
+	del, err := svc.dao.DeleteTag(svc.ctx, param.ID)
 	if err != nil {
 		return err
 	}
-	if tag.ID != 0 {
-		return errcode.ErrorCrateTagExists
+	if !del {
+		return errcode.ErrorDeleteTagFail
 	}
-	return svc.dao.CreateTag(param.Name, param.State, param.CreatedBy)
+	return nil
 }
-func (svc *Service) DeleteTag(param *DeleteTagRequest) error {
-	return svc.dao.DeleteTag(param.ID)
-}
+
 func (svc *Service) UpdateTag(param *UpdateTagRequest) error {
-	return svc.dao.UpdateTag(param.ID, param.Name, param.State, param.ModifiedBy)
+	return svc.dao.UpdateTag(svc.ctx, param.ID, param.Name, param.State, param.ModifiedBy)
 }

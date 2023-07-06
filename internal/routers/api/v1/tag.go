@@ -46,6 +46,7 @@ func (t Tag) List(c *gin.Context) {
 	}
 
 	svc := service.New(c.Request.Context())
+
 	pager := app.Pager{Page: app.GetPage(c), PageSize: app.GetPageSize(c)}
 	totalRows, err := svc.CountTag(&service.ConutTagRequest{Name: param.Name, State: param.State})
 	if err != nil {

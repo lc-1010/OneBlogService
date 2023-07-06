@@ -1,6 +1,8 @@
 package model
 
 import (
+	"context"
+
 	"github.com/lc-1010/OneBlogService/pkg/app"
 	"gorm.io/gorm"
 )
@@ -32,19 +34,19 @@ func NewBlogTag() *BlogTag {
 	}
 }
 
-func (t BlogTag) Count(db *gorm.DB) (int, error) {
+func (t BlogTag) Count(ctx context.Context, db *gorm.DB) (int, error) {
 	var count int64
 	if t.Name != "" {
 		db = db.Where("name = ?", t.Name)
 	}
-	db = db.Where("state = ?", t.State)
+	db = db.WithContext(ctx).Where("state = ?", t.State)
 	if err := db.Model(&t).Where("is_del = ?", 0).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return int(count), nil
 }
 
-func (t BlogTag) List(db *gorm.DB, pageOffset, pageSize int) ([]*BlogTag, error) {
+func (t BlogTag) List(ctx context.Context, db *gorm.DB, pageOffset, pageSize int) ([]*BlogTag, error) {
 	var tags []*BlogTag
 	var err error
 
@@ -54,24 +56,24 @@ func (t BlogTag) List(db *gorm.DB, pageOffset, pageSize int) ([]*BlogTag, error)
 	if t.Name != "" {
 		db = db.Where("name = ?", t.Name)
 	}
-	db = db.Where("state = ?", t.State)
+	db = db.WithContext(ctx).Where("state = ?", t.State)
 	if err = db.Where("is_del = ?", 0).Find(&tags).Error; err != nil {
 		return nil, err
 	}
 	return tags, err
 }
 
-func (t BlogTag) Create(db *gorm.DB) error {
-	return db.Create(&t).Error
+func (t BlogTag) Create(ctx context.Context, db *gorm.DB) error {
+	return db.WithContext(ctx).Create(&t).Error
 }
 
-func (t BlogTag) CheckName(db *gorm.DB) (BlogTag, error) {
+func (t BlogTag) CheckName(ctx context.Context, db *gorm.DB) bool {
 	var tag BlogTag
-	err := db.Where("name = ?", t.Name).First(&tag).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return tag, err
+	err := db.WithContext(ctx).Where("name = ?", t.Name).First(&tag).Error
+	if err != nil && err == gorm.ErrRecordNotFound {
+		return false
 	}
-	return tag, nil
+	return true
 }
 
 // Update Update  BlogTag
@@ -80,18 +82,27 @@ func (t BlogTag) CheckName(db *gorm.DB) (BlogTag, error) {
 // passed as a parameter is not nil to avoid null
 // pointer exceptions. Therefore, it is necessary to
 // initialize the structure before using it to avoid null pointer exceptions.
-func (t BlogTag) Update(db *gorm.DB, value any) error {
+func (t BlogTag) Update(ctx context.Context, db *gorm.DB, value any) error {
 	tag := NewBlogTag()
-	return db.Model(tag).Where("id = ? AND is_del = ?", t.ID, 0).Updates(value).Error
+	return db.WithContext(ctx).Model(tag).Where("id = ? AND is_del = ?", t.ID, 0).Updates(value).Error
 }
 
-func (t BlogTag) Delete(db *gorm.DB) error {
-	return db.Where("id = ? AND is_del = ?", t.Model.ID, 0).Delete(&t).Error
+func (t BlogTag) Delete(ctx context.Context, db *gorm.DB) (bool, error) {
+	err := db.WithContext(ctx).Where("id = ? AND is_del = ?", t.Model.ID, 0).Delete(&t).Error
+	if err != nil {
+		return false, nil
+	}
+
+	if db.RowsAffected > 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
 
-func (t BlogTag) Get(db *gorm.DB) (BlogTag, error) {
+func (t BlogTag) Get(ctx context.Context, db *gorm.DB) (BlogTag, error) {
 	var tag BlogTag
-	err := db.Where("id = ? and is_del = ? and state = ?",
+	err := db.WithContext(ctx).Where("id = ? and is_del = ? and state = ?",
 		t.ID, t.IsDel, t.State).First(&tag).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return tag, err

@@ -28,18 +28,17 @@ func Tracing() func(c *gin.Context) {
 		//那么在 A 系统的 SOFATracer RPC 客户端日志中，SpanId 分别是 0.1，0.2 和 0.3，在 B、C、D 三个系统的 SOFATracer RPC
 		//服务端日志中，SpanId 也分别是 0.1，0.2 和 0.3；如果 C 系统在处理请求的时候又调用了 E，F 两个系统，那么 C 系统中对应的 SOFATracer RPC 客户端日志是
 		//0.2.1 和 0.2.2，E、F 两个系统对应的 SOFATracer RPC 服务端日志也是 0.2.1 和 0.2.2。
+
 		tr := global.Tracer.Tracer("api")
 		// 将跟踪 ID 和子跟踪 ID 设置为 Gin 上下文的自定义头部。
 
-		nctx, span := tr.Start(ctx, ctx.Request.URL.Path, trace.WithAttributes(
+		nctx, spn := tr.Start(ctx, ctx.Request.URL.Path, trace.WithAttributes(
 			attribute.String("method", ctx.Request.Method),
 			attribute.String("ip", ctx.ClientIP()),
 			attribute.String("uri", ctx.Request.RequestURI),
-		))
+		), trace.WithNewRoot()) //totdo
 
-		defer span.End()
-		// ctx.Set("X-Trace-ID", traceID)
-		// ctx.Set("X-Span-ID", spanID)
+		defer spn.End()
 
 		// 使用包含跟踪的新上下文更新 Gin 请求的上下文。
 		ctx.Request = ctx.Request.WithContext(nctx)

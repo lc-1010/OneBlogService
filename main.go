@@ -66,6 +66,15 @@ func main() {
 	log.Println("Shutdown Server ...")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	// Tracer 推出
+	defer func(ctx context.Context) {
+		// Do not make the application hang when it is shutdown.
+		if err := global.Tracer.Shutdown(ctx); err != nil {
+			log.Fatal(err)
+		} else {
+			log.Println("Tracer shutdown")
+		}
+	}(ctx)
 	if err := s.Shutdown(ctx); err != nil {
 		log.Fatal("Server forced to shutdown:", err)
 	}
@@ -178,14 +187,6 @@ func setupTracer() error {
 	global.Tracer = tracerProvider
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	// defer func(ctx context.Context) {
-	// 	// Do not make the application hang when it is shutdown.
-	// 	ctx, cancel = context.WithTimeout(ctx, time.Second*5)
-	// 	defer cancel()
-	// 	if err := tracerProvider.Shutdown(ctx); err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// }(ctx)
 
 	tr := global.Tracer.Tracer("component-main")
 	_, span := tr.Start(ctx, "init")
