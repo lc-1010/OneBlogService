@@ -12,7 +12,7 @@ type Error struct {
 	details []string
 }
 
-var codes = map[int]string{}
+var b_codes = map[int]string{}
 
 // NewError creates a new Error object with the given code and message.
 //
@@ -23,10 +23,10 @@ var codes = map[int]string{}
 // Returns:
 // - *Error: a pointer to the newly created Error object.
 func NewError(code int, msg string) *Error {
-	if _, ok := codes[code]; ok {
+	if _, ok := b_codes[code]; ok {
 		panic(fmt.Sprintf("This code %d already exists. Please try another one", code))
 	}
-	codes[code] = msg
+	b_codes[code] = msg
 	return &Error{
 		code: code,
 		msg:  msg,
@@ -59,8 +59,8 @@ var (
 	UnauthoerizedTokenGenerate = NewError(1000006, "Unauthorized Token Generate")
 
 	// TooManyRequests 表示请求过多
-	TooManyRequests = NewError(1000007, "Too Many Requests")
-
+	TooManyRequests  = NewError(1000007, "Too Many Requests")
+	MethodNotAllowed = NewError(10000008, "不支持该方法")
 	//ServerError                = NewError(1000000, "server error")
 )
 
