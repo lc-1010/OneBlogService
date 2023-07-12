@@ -1,8 +1,8 @@
 syntax = "proto3";
-
+package proto;
 import "google/protobuf/any.proto";
 
-package proto;
+
 option  go_package = "github.com/lc-1010/OneBlogService/proto";
 
 message Pager {

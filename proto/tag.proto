@@ -1,11 +1,19 @@
 syntax = "proto3";
-import "proto/common.proto";
 
 package proto;
+
+import "common.proto";
+import "google/api/annotations.proto";
+
+
 option  go_package = "github.com/lc-1010/OneBlogService/proto";
 
 service TagService{
-    rpc GetTagList(GetTagListRequst) returns (GetTagListReply){}
+    rpc GetTagList(GetTagListRequst) returns (GetTagListReply){
+        option(google.api.http) = {
+            get:"/api/v1/tags"
+        };
+    }
 }
 
 message GetTagListRequst{
