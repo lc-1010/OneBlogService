@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -13,8 +14,10 @@ import (
 	"go.etcd.io/etcd/server/v3/proxy/grpcproxy"
 	"go.uber.org/zap"
 
+	assetfs "github.com/elazarl/go-bindata-assetfs"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/lc-1010/OneBlogService/pkg/swagger"
 	pb "github.com/lc-1010/OneBlogService/proto"
 	"github.com/lc-1010/OneBlogService/server"
 
@@ -70,6 +73,28 @@ func runHttpServer() *http.ServeMux {
 	serverMux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`pong`))
 	})
+
+	//swagger-ui
+	prefix := "/swagger-ui/"
+	fileServer := http.FileServer(&assetfs.AssetFS{
+		Asset:    swagger.Asset,
+		AssetDir: swagger.AssetDir,
+		Prefix:   "third_party/swagger-ui/dist/",
+	})
+
+	serverMux.Handle(prefix, http.StripPrefix(prefix, fileServer))
+	serverMux.HandleFunc("/swagger/", func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasSuffix(r.URL.Path, "swagger.json") {
+			http.NotFound(w, r)
+			return
+		}
+
+		p := strings.TrimPrefix(r.URL.Path, "/swagger/")
+		p = path.Join("proto", p)
+
+		http.ServeFile(w, r, p)
+	})
+
 	return serverMux
 }
 func RunServer1(port string) error {
