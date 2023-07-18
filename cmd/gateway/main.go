@@ -15,7 +15,6 @@ import (
 	"go.uber.org/zap"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/lc-1010/OneBlogService/cmd/internal/middleware"
 	"github.com/lc-1010/OneBlogService/global"
@@ -70,11 +69,17 @@ func grpcHandlderFunc(grpcServer *grpc.Server, otherHander http.Handler) http.Ha
 
 func runGrpcServer() *grpc.Server {
 	opts := []grpc.ServerOption{
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			middleware.Recovery,
+		grpc.ChainUnaryInterceptor(
+			middleware.AccessLog,
 			middleware.ErrorLog,
-			middleware.ServerTracing,
-		)),
+			middleware.Recovery,
+		),
+
+		// grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+		// 	middleware.Recovery,
+		// 	middleware.ErrorLog,
+		// 	middleware.ServerTracing,
+		// )),
 	}
 	s := grpc.NewServer(opts...)
 
