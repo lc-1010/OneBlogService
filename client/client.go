@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/lc-1010/OneBlogService/cmd/internal/middleware"
+	"github.com/lc-1010/OneBlogService/cmd/gateway/internal/middleware"
 	"github.com/lc-1010/OneBlogService/global"
 	"github.com/lc-1010/OneBlogService/pkg/tracer"
 	pb "github.com/lc-1010/OneBlogService/proto"
