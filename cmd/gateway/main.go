@@ -16,8 +16,8 @@ import (
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/lc-1010/OneBlogService/cmd/internal/middleware"
 	"github.com/lc-1010/OneBlogService/global"
+	rmd "github.com/lc-1010/OneBlogService/internal/middleware/cmd_grpc"
 	"github.com/lc-1010/OneBlogService/pkg/swagger"
 	"github.com/lc-1010/OneBlogService/pkg/tracer"
 	pb "github.com/lc-1010/OneBlogService/proto"
@@ -68,20 +68,27 @@ func grpcHandlderFunc(grpcServer *grpc.Server, otherHander http.Handler) http.Ha
 }
 
 func runGrpcServer() *grpc.Server {
-	opts := []grpc.ServerOption{
-		grpc.ChainUnaryInterceptor(
-			middleware.AccessLog,
-			middleware.ErrorLog,
-			middleware.Recovery,
-		),
+	// opts := []grpc.ServerOption{
+	// 	grpc.ChainUnaryInterceptor(
+	// 		rmd.AccessLog,
+	// 		rmd.ErrorLog,
+	// 		rmd.Recovery,
+	// 	),
 
-		// grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-		// 	middleware.Recovery,
-		// 	middleware.ErrorLog,
-		// 	middleware.ServerTracing,
-		// )),
-	}
-	s := grpc.NewServer(opts...)
+	// 	// grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+	// 	// 	rmd.Recovery,
+	// 	// 	rmd.ErrorLog,
+	// 	// 	rmd.ServerTracing,
+	// 	// )),
+	// }
+	//s := grpc.NewServer(opts...)
+	s := grpc.NewServer(grpc.ChainUnaryInterceptor(
+
+		rmd.AccessLog,
+		rmd.ErrorLog,
+		rmd.Recovery,
+		rmd.ServerTracing,
+	))
 
 	pb.RegisterTagServiceServer(s, server.NewTagServer())
 	reflection.Register(s)
@@ -160,12 +167,16 @@ func RunServer1(port string) error {
 }
 
 func main() {
+
 	err := RunServer(port)
 	if err != nil {
 		log.Fatalf("Run Serve err:%v", err)
 	}
+	//fmt.Println("ok-----")
+	// time.Sleep(time.Second * 15)
 
 }
+
 func RunServer(prot string) error {
 	httpMux := runHttpServer()
 

@@ -1,7 +1,8 @@
-package middleware
+package cmd_grpc
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"runtime/debug"
 	"time"
@@ -68,6 +69,7 @@ func AccessLog(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler
 //
 // It returns a response object of any type and an error.
 func ServerTracing(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		md = metadata.New(nil)
@@ -76,13 +78,15 @@ func ServerTracing(ctx context.Context, req any, info *grpc.UnaryServerInfo, han
 	mdmap := metatext.MetadataTextMap{MD: md}
 	attrs := []attribute.KeyValue{}
 
-	mdmap.Set("method", info.FullMethod)
-	mdmap.Set("remote-addr", md.Get("x-forwarded-for")[0])
+	//mdmap.Set("method", info.FullMethod)
+	//mdmap.Set("remote-addr", md.Get("x-forwarded-for")[0])
 
 	_ = mdmap.ForeachKey(func(key, val string) error {
 		attrs = append(attrs, attribute.String(key, val))
 		return nil
 	})
+
+	trace.SpanContextFromContext(ctx)
 
 	tr := global.Tracer.Tracer("grpc")
 	spanName := info.FullMethod
@@ -92,10 +96,12 @@ func ServerTracing(ctx context.Context, req any, info *grpc.UnaryServerInfo, han
 		trace.WithAttributes(
 			attrs...,
 		),
+		trace.WithSpanKind(trace.SpanKindServer),
 	}
 
 	c, span := tr.Start(ctx, spanName, spanOpts...)
 	defer span.End()
+	fmt.Println("ServerTracing.....")
 
 	return handler(c, req)
 }
