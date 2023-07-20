@@ -64,7 +64,7 @@ func ClientTracing() grpc.UnaryClientInterceptor {
 
 		for k, v := range md {
 			span.SetAttributes(attribute.StringSlice(k, v))
-			fmt.Println(k, v)
+
 		}
 
 		span.SetAttributes(attribute.StringSlice("service", []string{"flag-test-ok"}))

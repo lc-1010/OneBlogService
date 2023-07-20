@@ -3,8 +3,10 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/lc-1010/OneBlogService/global"
+	"github.com/lc-1010/OneBlogService/pkg/metatext"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc/metadata"
 )
 
 // Tracing returns a middleware handler function for the Gin framework.
@@ -31,12 +33,24 @@ func Tracing() func(c *gin.Context) {
 
 		tr := global.Tracer.Tracer("api")
 		// 将跟踪 ID 和子跟踪 ID 设置为 Gin 上下文的自定义头部。
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok {
+			md = metadata.New(nil)
+		}
 
-		nctx, spn := tr.Start(ctx, ctx.Request.URL.Path, trace.WithAttributes(
+		mdmap := metatext.MetadataTextMap{MD: md}
+		attrs := []attribute.KeyValue{}
+		_ = mdmap.ForeachKey(func(key, val string) error {
+			attrs = append(attrs, attribute.String(key, val))
+			return nil
+		})
+		attrs = append(attrs,
 			attribute.String("method", ctx.Request.Method),
 			attribute.String("ip", ctx.ClientIP()),
-			attribute.String("uri", ctx.Request.RequestURI),
-		), trace.WithNewRoot()) //totdo
+			attribute.String("uri", ctx.Request.RequestURI))
+		nctx, spn := tr.Start(ctx, ctx.Request.URL.Path, trace.WithAttributes(
+			attrs...,
+		)) //totdo
 
 		defer spn.End()
 

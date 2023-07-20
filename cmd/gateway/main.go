@@ -44,7 +44,7 @@ func init() {
 }
 func setupTracer() error {
 	tracerProvider, err := tracer.NewJaegerTrancer(
-		"grpc",
+		"myblog",
 		"127.0.0.1",
 		"6831",
 	)
@@ -132,7 +132,7 @@ func runHttpServer() *http.ServeMux {
 
 	return serverMux
 }
-func RunServer1(port string) error {
+func RunServer(port string) error {
 	httpMux := runHttpServer()
 	grpcS := runGrpcServer()
 	endpoint := "0.0.0.0:" + port
@@ -161,6 +161,7 @@ func RunServer1(port string) error {
 	defer etcdClient.Close()
 	logger, _ := zap.NewDevelopment()
 	target := fmt.Sprintf("/etcdv3://blogServer/grpc/%s", SERVICE_NAME)
+	fmt.Println(target)
 	grpcproxy.Register(logger, etcdClient, target, ":"+port, 60)
 
 	return http.ListenAndServe(":"+port, grpcHandlderFunc(grpcS, httpMux))
@@ -177,7 +178,7 @@ func main() {
 
 }
 
-func RunServer(prot string) error {
+func RunServer_old(prot string) error {
 	httpMux := runHttpServer()
 
 	grpcS := runGrpcServer()

@@ -86,8 +86,6 @@ func ServerTracing(ctx context.Context, req any, info *grpc.UnaryServerInfo, han
 		return nil
 	})
 
-	trace.SpanContextFromContext(ctx)
-
 	tr := global.Tracer.Tracer("grpc")
 	spanName := info.FullMethod
 	attrs = append(attrs, attribute.String("service", "flag-test-ok"))

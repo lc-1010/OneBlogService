@@ -177,7 +177,7 @@ func setupLogger() error {
 
 func setupTracer() error {
 	tracerProvider, err := tracer.NewJaegerTrancer(
-		"blog",
+		"myblog",
 		"127.0.0.1",
 		"6831",
 	)

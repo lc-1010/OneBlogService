@@ -30,7 +30,7 @@ func NewJaegerTrancer(serviceName, agentHost, agentPort string) (*tracesdk.Trace
 
 	tp := tracesdk.NewTracerProvider(
 		// 使用给定的批处理器配置追踪器提供程序
-		tracesdk.WithBatcher(exp, tracesdk.WithMaxExportBatchSize(100)),
+		tracesdk.WithBatcher(exp, tracesdk.WithMaxExportBatchSize(10)),
 
 		// 使用给定的资源配置追踪器提供程序
 		tracesdk.WithResource(resource.NewWithAttributes(

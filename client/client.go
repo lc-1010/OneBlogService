@@ -40,28 +40,49 @@ func main() {
 	)
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	tagServiceClient := pb.NewTagServiceClient(clientConn)
-	resp, err := tagServiceClient.GetTagList(ctx, &pb.GetTagListRequst{Name: "rust"})
-	opts := []trace.SpanStartOption{}
+	req := &pb.GetTagListRequst{Name: "rust"}
+
+	resp, err := tagServiceClient.GetTagList(ctx, req)
 	if err != nil {
-		fmt.Println(err)
+		log.Printf("got err :%v\n", err)
 	} else {
-		opts = []trace.SpanStartOption{
-			trace.WithAttributes(
-				attribute.String("request.name", "rust"),
-				attribute.Int("response.count", len(resp.List)),
-			),
+		resp = &pb.GetTagListReply{
+			List:  []*pb.Tag{},
+			Pager: &pb.Pager{},
 		}
 	}
-
-	ctx, span := global.Tracer.Tracer("client1").Start(context.Background(), "GetTagList", opts...)
-	defer span.End()
 	log.Printf("resp:----%v,%v\n", resp, ctx)
-	time.Sleep(10 * time.Second)
-	//time.Sleep(time.Second * 20)
+
 	defer func(ctx context.Context) {
-		global.Tracer.ForceFlush(ctx)
 		global.Tracer.Shutdown(ctx)
 	}(ctx)
+
+	RespSapn(ctx, resp)
+}
+
+func RespSapn(ctx context.Context, resp *pb.GetTagListReply) {
+
+	opts := []trace.SpanStartOption{
+		trace.WithAttributes(
+			attribute.String("request.name", "rust"),
+			attribute.String("resp.String", resp.String()),
+		),
+	}
+
+	tr := global.Tracer.Tracer("client")
+	_, span := tr.Start(ctx, "resp", opts...)
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		md = metadata.New(nil)
+	}
+	fmt.Printf("\nmd--%#v\n", md)
+	for k, v := range md {
+
+		span.SetAttributes(attribute.StringSlice(k, v))
+	}
+
+	defer span.End()
+	//fmt.Printf("ok RunSpan,%#v", ctx)
 }
 
 func GetClientConn(ctx context.Context, target string, opts []grpc.DialOption) (*grpc.ClientConn, error) {
@@ -78,7 +99,7 @@ func init() {
 
 func setupTracer() error {
 	tracerPorvider, err := tracer.NewJaegerTrancer(
-		"cligrpc",
+		"myblog",
 		"127.0.0.1",
 		"6831",
 	)

@@ -75,7 +75,7 @@ func NewRouter() *gin.Engine {
 	r.StaticFS("/static", http.Dir(global.AppSetting.UploadSavePath))
 
 	// auth
-	r.POST("/auth", api.GetAuth)
+	r.GET("/auth", api.GetAuth)
 	//ping test
 	p := r.Group("/test")
 	{
