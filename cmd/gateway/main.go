@@ -132,7 +132,7 @@ func runHttpServer() *http.ServeMux {
 
 	return serverMux
 }
-func RunServer(port string) error {
+func RunServerEtcd(port string) error {
 	httpMux := runHttpServer()
 	grpcS := runGrpcServer()
 	endpoint := "0.0.0.0:" + port
@@ -141,14 +141,14 @@ func RunServer(port string) error {
 	_ = pb.RegisterTagServiceHandlerFromEndpoint(context.Background(), gwmux, endpoint, dopts)
 	httpMux.Handle("/", gwmux)
 
-	cc, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	cc, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 	etcdClient, err := clientv3.New(clientv3.Config{
 		Endpoints: []string{
 			"http://localhost:2379",
 		},
-		DialTimeout: time.Second * 2,
-		Context:     cc,
+		DialTimeout: time.Second * 5,
+		//Context:     cc,
 	})
 
 	if err != nil {
@@ -159,26 +159,36 @@ func RunServer(port string) error {
 	//res, _ := etcdClient.Get(context.Background(), "abc", clientv3.WithPrefix())
 
 	defer etcdClient.Close()
-	logger, _ := zap.NewDevelopment()
-	target := fmt.Sprintf("/etcdv3://blogServer/grpc/%s", SERVICE_NAME)
-	fmt.Println(target)
+	logger, _ := zap.NewDevelopment(zap.AddCaller(), zap.AddStacktrace(zap.DebugLevel))
+	target := fmt.Sprintf("etcd:///blogServer/grpc/%s", SERVICE_NAME)
+	fmt.Println(target, port)
 	grpcproxy.Register(logger, etcdClient, target, ":"+port, 60)
+
+	resp, err := etcdClient.Get(cc, "a", clientv3.WithFirstRev()...)
+	if err != nil {
+		log.Fatalf("get:%#v\n", err)
+	}
+
+	for _, kv := range resp.Kvs {
+		fmt.Printf("key=%s, value=%s\n", kv.Key, kv.Value)
+	}
 
 	return http.ListenAndServe(":"+port, grpcHandlderFunc(grpcS, httpMux))
 }
 
 func main() {
 
-	err := RunServer(port)
+	//err := RunServer(port)
+	err := RunServerEtcd(port)
 	if err != nil {
 		log.Fatalf("Run Serve err:%v", err)
 	}
-	//fmt.Println("ok-----")
+	fmt.Println("ok-----")
 	// time.Sleep(time.Second * 15)
 
 }
 
-func RunServer_old(prot string) error {
+func RunServer(prot string) error {
 	httpMux := runHttpServer()
 
 	grpcS := runGrpcServer()

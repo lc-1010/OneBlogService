@@ -2,7 +2,6 @@ package cmd_grpc
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -70,7 +69,7 @@ func ClientTracing() grpc.UnaryClientInterceptor {
 		span.SetAttributes(attribute.StringSlice("service", []string{"flag-test-ok"}))
 
 		newCtx = metadata.NewOutgoingContext(newCtx, md)
-		fmt.Println(md, newCtx, "======")
+		//fmt.Println(md, newCtx, "======")
 		return invoker(newCtx, method, req, resp, cc, opts...)
 
 	}
