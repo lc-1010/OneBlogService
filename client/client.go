@@ -110,7 +110,7 @@ func GetClientConn(ctx context.Context, serviceName string, opts []grpc.DialOpti
 		DialTimeout: time.Second * 15,
 	}
 	cli, err := clientv3.New(config)
-	//cli, err := clientv3.NewFromURL("http://localhost:2379")
+	cli, err = clientv3.NewFromURL("http://localhost:2379")
 	if err != nil {
 		return nil, err
 	}
@@ -123,6 +123,7 @@ func GetClientConn(ctx context.Context, serviceName string, opts []grpc.DialOpti
 	}
 	log.Printf("etcdResolver:%#v\n", etcdResolver)
 	//target := fmt.Sprintf("%s:%d", "tag-service", 8004)
+
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithResolvers(etcdResolver))
 
@@ -136,17 +137,6 @@ func GetClientConn(ctx context.Context, serviceName string, opts []grpc.DialOpti
 
 	return g, nil
 
-}
-
-func ff(cli *clientv3.Client) {
-	res, err := cli.Get(context.Background(), "/etcd://blogServer/grpc/tag-service/", clientv3.WithPrefix())
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, kv := range res.Kvs {
-		fmt.Printf("---->Key: %s, Value: %s\n", kv.Key, kv.Value)
-	}
-	fmt.Printf("res-->%#v", res)
 }
 
 func init() {

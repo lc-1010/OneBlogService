@@ -160,7 +160,7 @@ func RunServerEtcd(port string) error {
 
 	defer etcdClient.Close()
 	logger, _ := zap.NewDevelopment(zap.AddCaller(), zap.AddStacktrace(zap.DebugLevel))
-	target := fmt.Sprintf("etcd:///blogServer/grpc/%s", SERVICE_NAME)
+	target := fmt.Sprintf("blogServer/grpc/%s", SERVICE_NAME)
 	fmt.Println(target, port)
 	grpcproxy.Register(logger, etcdClient, target, ":"+port, 60)
 
