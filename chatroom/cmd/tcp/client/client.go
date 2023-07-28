@@ -13,16 +13,16 @@ func main() {
 		panic(err)
 	}
 
-	done := make(chan struct{})
+	//done := make(chan struct{})
 
 	go func() {
 		io.Copy(os.Stdout, conn)
 		log.Panicln("done")
-		done <- struct{}{}
+		//done <- struct{}{}
 	}()
 	mustCopy(conn, os.Stdin)
 	conn.Close()
-	<-done
+	//<-done
 
 }
 func mustCopy(dst io.Writer, src io.Reader) {
